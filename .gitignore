@@ -1,0 +1,7 @@
+node_modules/
+_verify/
+_probe/
+coverage/
+shots/
+*.log
+test/.tmp-report.md

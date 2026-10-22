@@ -1,0 +1,48 @@
+{
+  "name": "cronoscope",
+  "version": "1.0.0",
+  "description": "Audit cron schedules against wall-clock reality: dead expressions, silent field shifts, DST skips and duplicates, cross-job collisions.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "cronoscope": "bin/cronoscope.js"
+  },
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "docs",
+    "demo",
+    "examples",
+    "third_party",
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "bench": "node scripts/bench.mjs",
+    "build:demo": "node scripts/build-demo.mjs",
+    "licenses": "node scripts/collect-licenses.mjs",
+    "verify": "npm run licenses && npm test && npm run build:demo && node scripts/verify-demo.mjs",
+    "audit:sample": "node bin/cronoscope.js audit examples/jobs.json --from 2026-03-01 --to 2026-03-31 --tz America/New_York --format md --out examples/report-2026-03.md",
+    "docs:images": "node scripts/build-demo.mjs && node scripts/capture-images.mjs"
+  },
+  "dependencies": {
+    "cron-parser": "5.10.2",
+    "cronstrue": "3.38.0",
+    "luxon": "3.7.2"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "vitest": "3.2.4"
+  }
+}

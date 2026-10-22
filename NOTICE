@@ -1,0 +1,46 @@
+cronoscope
+==========
+
+Copyright (c) 2026 cronoscope contributors.
+Licensed under the MIT License; see LICENSE.
+
+Scope of this work
+------------------
+
+cronoscope is **not a fork** of any single upstream project. It is an
+independent tool that composes three libraries at runtime:
+
+  * cron-parser  5.10.2  MIT  Copyright (c) 2014-2023 Harri Siirak
+        used as the execution oracle: it decides which instants a cron
+        expression fires. No source is copied into this repository.
+  * cRonstrue    3.38.0  MIT  Copyright (c) 2017 Brady Holt
+        used as the description engine: it turns an expression into natural
+        language in English and Chinese. No source is copied.
+  * luxon        3.7.2   MIT  Copyright (c) 2019 JS Foundation and other
+        contributors
+        used for the IANA time zone database and wall-clock arithmetic.
+        No source is copied.
+
+All three are consumed as pinned npm dependencies and bundled unmodified into
+`demo/bundle.js` for the browser build. Their licence texts are reproduced
+verbatim under `third_party/<package>/LICENSE`, hashed in
+`third_party/INDEX.json`, and reprinted in full in `THIRD_PARTY_NOTICES.md`.
+No upstream file has been modified, so no upstream copyright notice needs to be
+altered; the notices are simply carried along.
+
+What is original to this project
+--------------------------------
+
+Everything under `src/` and `test/`, plus `demo/`, `scripts/` and `docs/`:
+
+  * the nominal field model (`src/expression.js`) that reconstructs the
+    wall-clock readings an expression asks for, including the left-padding that
+    cron-parser applies to short expressions;
+  * the wall-clock resolver (`src/wallclock.js`) that classifies a reading as
+    unique / ambiguous / nonexistent and enumerates the instants;
+  * the audit engine (`src/audit.js`) that diffs the nominal model against the
+    engine's output slot by slot;
+  * collision analysis, the four export targets, the CLI and the browser UI.
+
+Trademarks and project names belong to their respective owners. The upstream
+projects do not endorse this tool.

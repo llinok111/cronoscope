@@ -1,0 +1,68 @@
+{
+  "comment": "A deliberately uneven set of production-shaped jobs: three time zones, one DST landmine, one short expression, one impossible date, one dense schedule.",
+  "jobs": [
+    {
+      "name": "nightly-backup",
+      "expression": "30 2 * * *",
+      "tz": "America/New_York",
+      "durationSeconds": 900,
+      "slaMaxGapSeconds": 180000,
+      "note": "02:30 local; the US spring-forward gap lands exactly here"
+    },
+    {
+      "name": "cache-warm",
+      "expression": "0 2 * * *",
+      "tz": "America/New_York",
+      "durationSeconds": 600
+    },
+    {
+      "name": "quarter-hour-metrics",
+      "expression": "*/15 * * * *",
+      "tz": "America/New_York",
+      "durationSeconds": 30,
+      "slaMaxGapSeconds": 1800
+    },
+    {
+      "name": "london-settlement",
+      "expression": "45 1 * * *",
+      "tz": "Europe/London",
+      "durationSeconds": 120,
+      "note": "01:45 local sits inside the UK fall-back hour"
+    },
+    {
+      "name": "typo-four-fields",
+      "expression": "0 3 * *",
+      "tz": "UTC",
+      "note": "someone deleted the day-of-week column"
+    },
+    {
+      "name": "monthly-report",
+      "expression": "0 6 1 * *",
+      "tz": "Asia/Shanghai",
+      "durationSeconds": 300
+    },
+    {
+      "name": "last-day-close",
+      "expression": "0 23 L * *",
+      "tz": "Asia/Shanghai"
+    },
+    {
+      "name": "first-monday-audit",
+      "expression": "0 9 * * 1#1",
+      "tz": "Europe/Berlin"
+    },
+    {
+      "name": "impossible-date",
+      "expression": "0 0 31 2 *",
+      "tz": "UTC",
+      "note": "31 February never exists"
+    },
+    {
+      "name": "dense-heartbeat",
+      "expression": "* * * * *",
+      "tz": "America/New_York",
+      "durationSeconds": 5,
+      "note": "dense enough that the audit samples around offset changes instead of expanding a year"
+    }
+  ]
+}

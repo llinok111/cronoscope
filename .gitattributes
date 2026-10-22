@@ -1,0 +1,5 @@
+# Licence texts are hashed by test/licenses.test.js: they must survive a
+# checkout byte-for-byte, so git must not rewrite their line endings.
+third_party/** -text
+
+*.png binary

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>cronoscope — audit cron against the wall clock</title>
+<style>
+  :root {
+    --ink: #14100d;
+    --ink-2: #1d1712;
+    --ink-3: #251d17;
+    --line: #3a2e25;
+    --text: #f3e9dc;
+    --muted: #a89a89;
+    --amber: #e0a458;
+    --amber-dim: #a97a3c;
+    --error: #d2644f;
+    --warn: #d99346;
+    --ok: #8aa86a;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, "Noto Sans SC", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(1200px 600px at 20% -10%, #241a13 0%, var(--ink) 60%);
+    color: var(--text);
+    font: 14px/1.55 var(--sans);
+    display: flex; flex-direction: column;
+  }
+  header {
+    padding: 22px 26px 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px;
+  }
+  h1 { font-size: 19px; margin: 0; letter-spacing: .04em; font-weight: 650; }
+  h1 span { color: var(--amber); }
+  .tagline { color: var(--muted); font-size: 12.5px; }
+  .versions { margin-left: auto; font: 11px/1.4 var(--mono); color: var(--amber-dim); text-align: right; }
+  main {
+    flex: 1; display: grid; gap: 16px; padding: 16px 26px 24px;
+    grid-template-columns: minmax(330px, 420px) 1fr;
+    align-items: start; min-height: 0;
+  }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--ink-2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .panel > h2 {
+    margin: 0; padding: 10px 14px; font-size: 11.5px; letter-spacing: .13em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 1px solid var(--line); font-weight: 600;
+  }
+  .panel-body { padding: 12px 14px; }
+  .job {
+    border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; margin-bottom: 9px;
+    background: var(--ink-3); cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .job[aria-current="true"] { border-color: var(--amber-dim); background: #2a2018; }
+  .job .row { display: flex; gap: 6px; align-items: center; }
+  .job .name { flex: 1; font-weight: 600; font-size: 13px; }
+  input, select, button {
+    font: 12.5px var(--mono); color: var(--text); background: #17120e;
+    border: 1px solid var(--line); border-radius: 6px; padding: 5px 7px;
+  }
+  input:focus-visible, select:focus-visible, button:focus-visible {
+    outline: 2px solid var(--amber); outline-offset: 1px;
+  }
+  input[type="text"] { width: 100%; }
+  button { cursor: pointer; background: #241c15; color: var(--text); }
+  button:hover { border-color: var(--amber-dim); }
+  button.primary { background: var(--amber); color: #1a1208; border-color: var(--amber); font-weight: 650; }
+  button.ghost { background: transparent; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+  .chip {
+    font: 11px var(--mono); padding: 2px 7px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted); background: #1a140f;
+  }
+  .chip.err { border-color: #6d3226; color: #f0b3a6; background: #2a1712; }
+  .chip.warn { border-color: #6b4a22; color: #f0cb9a; background: #271c11; }
+  .chip.ok { border-color: #3f5230; color: #c8dfae; background: #1a2114; }
+  .finding { border-left: 3px solid var(--line); padding: 7px 0 7px 10px; margin: 8px 0; }
+  .finding.error { border-color: var(--error); }
+  .finding.warn { border-color: var(--warn); }
+  .finding.info { border-color: var(--amber-dim); }
+  .finding h3 { margin: 0 0 2px; font-size: 12.5px; font-weight: 650; }
+  .finding code { color: var(--amber); font-size: 11px; }
+  .finding p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+  details { margin-top: 5px; }
+  details summary { cursor: pointer; color: var(--amber-dim); font-size: 11.5px; }
+  pre {
+    margin: 6px 0 0; padding: 8px; background: #120e0b; border: 1px solid var(--line);
+    border-radius: 6px; overflow: auto; font: 11px/1.5 var(--mono); color: #d8c9b6; max-height: 220px;
+  }
+  table { width: 100%; border-collapse: collapse; font: 11.5px var(--mono); }
+  th, td { text-align: left; padding: 3px 6px; border-bottom: 1px solid #241c15; white-space: nowrap; }
+  th { color: var(--muted); font-weight: 500; }
+  .desc { font-size: 13.5px; }
+  .desc .zh { color: var(--muted); }
+  .empty { color: var(--muted); font-size: 12.5px; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .toolbar label { font-size: 11px; color: var(--muted); display: flex; gap: 5px; align-items: center; }
+  .toolbar input { width: 110px; }
+  footer { border-top: 1px solid var(--line); padding: 10px 26px 16px; color: var(--muted); font-size: 11.5px; }
+  footer a { color: var(--amber-dim); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>crono<span>scope</span></h1>
+  <div class="tagline">你的 cron 表达式在真实时区里到底什么时候跑、跑几次、会不会漏掉。</div>
+  <div class="versions" id="versions">loading…</div>
+</header>
+
+<main>
+  <section class="panel" aria-labelledby="jobs-h">
+    <h2 id="jobs-h">Schedules</h2>
+    <div class="panel-body">
+      <div class="toolbar">
+        <label>from <input id="from" type="text" value="2026-03-01" aria-label="window start" /></label>
+        <label>to <input id="to" type="text" value="2026-03-31" aria-label="window end" /></label>
+        <button id="run" class="primary" type="button">Run audit</button>
+      </div>
+      <div id="jobs"></div>
+      <div class="toolbar" style="margin-top:2px">
+        <button id="add" class="ghost" type="button">+ add job</button>
+        <button id="preset" class="ghost" type="button">load the DST set</button>
+      </div>
+      <p class="empty" id="hint">
+        编辑表达式后回车即可重算。时区来自运行环境的 IANA 数据库。
+      </p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="report-h">
+    <h2 id="report-h">Report</h2>
+    <div class="panel-body" id="report" aria-live="polite">
+      <p class="empty">还没有结果。</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span id="footer-note">cron-parser 负责“实际跑在哪些瞬间”，cRonstrue 负责“这句话怎么读”，luxon 负责“那个时区的墙钟长什么样”。三者不一致的地方，就是这份报告。</span>
+</footer>
+
+<script type="module" src="./bundle.js"></script>
+</body>
+</html>

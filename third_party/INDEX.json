@@ -1,0 +1,43 @@
+{
+  "generatedFrom": "npm runtime closure",
+  "packages": [
+    {
+      "name": "cron-parser",
+      "version": "5.10.2",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2014-2023 Harri Siirak",
+      "source": "https://github.com/harrisiirak/cron-parser",
+      "homepage": null,
+      "file": "third_party/cron-parser/LICENSE",
+      "sha256": "7eba1c8774e8bcb77356bafc70ac9de8383e7592bb79ab979130ab757d40f53d",
+      "bytes": 1084,
+      "requiredBy": []
+    },
+    {
+      "name": "cronstrue",
+      "version": "3.38.0",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2017 Brady Holt",
+      "source": "https://github.com/bradymholt/cRonstrue",
+      "homepage": "https://github.com/bradymholt/cronstrue",
+      "file": "third_party/cronstrue/LICENSE",
+      "sha256": "80b0695c69ed300a023a560fe3d342e82d7015d0dde6a05c709bfdc072edfab2",
+      "bytes": 1077,
+      "requiredBy": []
+    },
+    {
+      "name": "luxon",
+      "version": "3.7.2",
+      "license": "MIT",
+      "copyright": "Copyright 2019 JS Foundation and other contributors",
+      "source": "https://github.com/moment/luxon",
+      "homepage": null,
+      "file": "third_party/luxon/LICENSE.md",
+      "sha256": "6cb2f2bf697ee9c6fa9eb8f227c63ee6e7a3cba42d4717f14c745ef9b6cbc006",
+      "bytes": 1076,
+      "requiredBy": [
+        "cron-parser"
+      ]
+    }
+  ]
+}
