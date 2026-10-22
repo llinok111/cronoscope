@@ -20,6 +20,9 @@ cronoscope builds three independent views of every schedule and diffs them:
 database and the wall-clock arithmetic. Every finding is a divergence between
 two of those views and carries the instants that prove it.
 
+**[Live demo →](https://llinok111.github.io/cronoscope/)** — the page runs the
+same `audit()` call as the CLI, in your browser.
+
 ```
 ! nightly-backup  [America/New_York]  30 2 * * *
    At 02:30   ·   在02:30

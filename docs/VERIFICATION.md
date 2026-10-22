@@ -123,6 +123,38 @@ What this proves: the images are real captures of the rendered page, not blank,
 not white, not half-painted. What it does not prove: that they look good. No
 human or model has looked at them (see "Not done").
 
+## Deployment
+
+| item | value |
+|---|---|
+| repository | https://github.com/llinok111/cronoscope (public, MIT) |
+| branch / commit | `main` / `c450010` |
+| Pages build type | `workflow` (`.github/workflows/pages.yml`, artifact = `demo/`) |
+| workflow run | `39838397809` — success |
+| live URL | https://llinok111.github.io/cronoscope/ |
+
+Checks against the live site, from this machine:
+
+```text
+$ curl -o page.html -w '%{http_code} %{size_download}' https://llinok111.github.io/cronoscope/
+200 6711
+
+$ curl -o bundle.js -w '%{http_code} %{size_download}' https://llinok111.github.io/cronoscope/bundle.js
+200 445466        # starts with the MIT licence banner for the three upstreams
+
+$ chrome --headless=new --dump-dom https://llinok111.github.io/cronoscope/
+21136 bytes of DOM, containing "dst.gap.shifted", "2026-03-08 03:30:00 -04:00"
+and "cron-parser 5.10.2"
+```
+
+The first workflow run failed, and the reason is worth recording: a new
+repository has no Pages site, so `actions/configure-pages` returned `Get Pages
+site failed … Not Found`. Creating the site with `build_type=workflow` and
+re-dispatching the same workflow fixed it — no code change was involved.
+
+`docs/images/` is not served by the site (the Pages artifact is `demo/` only);
+the screenshots exist for the README on GitHub.
+
 ## Not done
 
 * **No human visual review of the screenshots.** This machine's image-reading
